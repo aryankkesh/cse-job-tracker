@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>placement.log — CSE job tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F1419;
+    --panel:#161B22;
+    --panel-2:#1C2330;
+    --line:#2A3140;
+    --text:#E6EDF3;
+    --text-dim:#8B98A5;
+    --signal:#FFD60A;
+    --signal-dim:#8a7407;
+    --link:#58A6FF;
+    --ok:#3FB950;
+    --warn:#F0883E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    line-height:1.5;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:28px 20px 80px;}
+
+  header{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px;margin-bottom:6px;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:26px;font-weight:700;margin:0;letter-spacing:-0.02em;
+  }
+  .brand .dot{color:var(--signal);}
+  .brand .tag{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);}
+  .sub{font-size:13px;color:var(--text-dim);text-align:right;font-family:'JetBrains Mono',monospace;}
+
+  .terminal{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:14px 16px;
+    margin:20px 0 24px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--ok);
+  }
+  .terminal .prompt{color:var(--signal);margin-right:8px;}
+  .cursor{
+    display:inline-block;width:7px;height:14px;background:var(--signal);
+    margin-left:4px;vertical-align:-2px;
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  .tabs{display:flex;gap:6px;margin:20px 0 18px;border-bottom:1px solid var(--line);}
+  .tab{
+    font-family:'JetBrains Mono',monospace;font-size:13px;
+    color:var(--text-dim);padding:9px 4px;margin-right:18px;
+    cursor:pointer;border-bottom:2px solid transparent;
+  }
+  .tab.active{color:var(--signal);border-bottom-color:var(--signal);}
+
+  .hack-card{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px;margin-bottom:10px;
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+  }
+  .hack-card .h-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;margin:0 0 4px;}
+  .hack-card .h-desc{font-size:13px;color:var(--text-dim);margin:0;}
+  .hack-card a.apply{
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    color:var(--ink);background:var(--signal);
+    padding:8px 14px;border-radius:5px;text-decoration:none;
+    white-space:nowrap;font-weight:500;margin-left:14px;
+  }
+  .hack-card a.apply:hover{background:#ffe454;}
+
+  .filters{
+    display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;
+  }
+  .filters input[type=text]{
+    flex:1;min-width:200px;
+    background:var(--panel);border:1px solid var(--line);
+    color:var(--text);border-radius:6px;padding:9px 12px;
+    font-family:'IBM Plex Sans',sans-serif;font-size:14px;
+  }
+  .filters input[type=text]:focus{outline:none;border-color:var(--signal-dim);}
+  .chip{
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    border:1px solid var(--line);background:var(--panel);
+    color:var(--text-dim);padding:8px 12px;border-radius:6px;
+    cursor:pointer;user-select:none;
+  }
+  .chip.active{border-color:var(--signal);color:var(--signal);}
+
+  .meta-row{
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);
+    margin-bottom:10px;
+  }
+
+  .job{
+    display:grid;grid-template-columns:14px 1fr auto;gap:14px;
+    align-items:start;
+    padding:16px 4px;
+    border-bottom:1px solid var(--line);
+  }
+  .job:last-child{border-bottom:none;}
+  .job .mark{color:var(--signal);font-family:'JetBrains Mono',monospace;padding-top:3px;}
+  .job .role{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin:0 0 4px;}
+  .job .company{color:var(--text-dim);font-size:13px;margin:0 0 8px;}
+  .job .company b{color:var(--text);font-weight:500;}
+  .job .tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .job .tags span{
+    font-family:'JetBrains Mono',monospace;font-size:11px;
+    background:var(--panel-2);color:var(--text-dim);
+    padding:3px 8px;border-radius:4px;border:1px solid var(--line);
+  }
+  .job a.apply{
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    color:var(--ink);background:var(--signal);
+    padding:8px 14px;border-radius:5px;text-decoration:none;
+    white-space:nowrap;font-weight:500;
+    align-self:center;
+  }
+  .job a.apply:hover{background:#ffe454;}
+
+  .empty, .loading, .error{
+    text-align:center;padding:50px 20px;color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace;font-size:13px;
+  }
+  .error{color:var(--warn);}
+
+  .note{
+    margin-top:36px;padding:14px 16px;background:var(--panel);
+    border-left:2px solid var(--signal-dim);border-radius:0 6px 6px 0;
+    font-size:13px;color:var(--text-dim);
+  }
+  .note b{color:var(--text);}
+
+  footer{
+    margin-top:40px;font-family:'JetBrains Mono',monospace;font-size:11px;
+    color:var(--text-dim);text-align:center;
+  }
+
+  @media(max-width:600px){
+    .job{grid-template-columns:1fr;}
+    .job .mark{display:none;}
+    .job a.apply{width:100%;text-align:center;margin-top:8px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <h1>placement<span class="dot">.</span>log</h1>
+      <span class="tag">// cse recruitment feed</span>
+    </div>
+    <div class="sub" id="clock">--</div>
+  </header>
+
+  <div class="terminal">
+    <span class="prompt">$</span><span id="term-line">scanning open sources</span><span class="cursor"></span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="jobs">jobs</div>
+    <div class="tab" data-tab="internships">internships</div>
+    <div class="tab" data-tab="hackathons">hackathons</div>
+    <div class="tab" data-tab="india">india platforms</div>
+  </div>
+
+  <div id="panel-jobs">
+    <div class="filters">
+      <input type="text" id="search" placeholder="role ya company search karo (e.g. backend, frontend)">
+      <div class="chip active" data-f="all">all roles</div>
+      <div class="chip" data-f="ai">AI/ML</div>
+      <div class="chip" data-f="fullstack">full stack</div>
+      <div class="chip" data-f="frontend">frontend</div>
+      <div class="chip" data-f="backend">backend</div>
+      <div class="chip" data-f="cyber">cyber security</div>
+      <div class="chip" data-f="remote">remote</div>
+    </div>
+    <div class="meta-row">
+      <span id="count-label">loading…</span>
+      <span id="src-label">source: jobicy.com public feed</span>
+    </div>
+    <div id="results"></div>
+  </div>
+
+  <div id="panel-internships" style="display:none;">
+    <div class="filters">
+      <input type="text" id="search-intern" placeholder="internship search karo (e.g. python, design)">
+      <div class="chip active" data-f="all">all</div>
+      <div class="chip" data-f="remote">remote</div>
+    </div>
+    <div class="meta-row">
+      <span id="count-label-intern">loading…</span>
+      <span id="src-label-intern">source: jobicy.com public feed</span>
+    </div>
+    <div id="results-intern"></div>
+  </div>
+
+  <div id="panel-hackathons" style="display:none;">
+    <div class="meta-row">
+      <span>trusted hackathon platforms — direct links</span>
+      <span></span>
+    </div>
+    <div id="results-hack"></div>
+    <div class="note" style="margin-top:16px;">
+      <b>Note:</b> hackathon listings har platform khud manage karta hai aur koi free public API nahi deta jisse live events yahan auto-fetch ho sakein. Isliye yahan fake/purani listing dikhane ke bajaye seedha un platforms ke live pages diye hain — jahan aap real-time upcoming hackathons dekh sakte ho.
+    </div>
+  </div>
+
+  <div id="panel-india" style="display:none;">
+    <div class="meta-row">
+      <span>India ke trusted job/internship platforms — direct links</span>
+      <span></span>
+    </div>
+    <div id="results-india"></div>
+    <div class="note" style="margin-top:16px;">
+      <b>Note:</b> Naukri, LinkedIn aur Internshala jaisi sites free public API nahi deti — isliye India-specific live jobs is website ke andar auto-fetch nahi ho sakte (wo scraping hoga, jo legally allowed nahi hai). Yahan seedha un platforms ke CSE/tech search pages diye gaye hain jo hamesha live/up-to-date rahenge.
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Sach batayein:</b> ye ek live-working demo hai jo ek real public job API (Jobicy) se software/tech roles fetch karke dikha raha hai — LinkedIn/Naukri jaisi sites free API nahi deti, isliye unse direct auto-fetch scraping ban jaata hai aur legally risky hai. Ek proper college placement tracker ke liye agla step: apni team/TPO se companies ki career-page links + campus mail alerts ko ek admin panel se curate karna, ya paid job-board API (Adzuna, RapidAPI job boards) jodna.
+  </div>
+
+  <footer>built as a working prototype · data via jobicy public api</footer>
+</div>
+
+<script>
+const results = document.getElementById('results');
+const countLabel = document.getElementById('count-label');
+const termLine = document.getElementById('term-line');
+const clockEl = document.getElementById('clock');
+const searchInput = document.getElementById('search');
+const chips = document.querySelectorAll('.chip');
+
+let allJobs = [];
+let activeFilter = 'all';
+
+function updateClock(){
+  const now = new Date();
+  clockEl.textContent = now.toLocaleString('en-IN', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'});
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+const CSE_KEYWORDS = ['develop','software','engineer','program','sde','backend','back-end','frontend','front-end','full stack','fullstack','data','it ','tech','web','cloud','devops','system','application','python','java','javascript','android','ios','qa','test','ai ','artificial intelligence','machine learning',' ml','ml engineer','cyber','security','network','database','sql','blockchain','embedded','mobile','react','node','golang','rust','kubernetes'];
+
+const CATEGORY_MAP = {
+  ai: ['ai ','artificial intelligence','machine learning',' ml ','ml engineer','data scientist','deep learning'],
+  fullstack: ['full stack','fullstack'],
+  frontend: ['frontend','front-end','react','ui developer'],
+  backend: ['backend','back-end','node','api developer','django','spring'],
+  cyber: ['cyber','security','penetration','soc analyst']
+};
+
+function isCseRelevant(title){
+  const t = title.toLowerCase();
+  return CSE_KEYWORDS.some(k => t.includes(k));
+}
+
+function timeAgo(dateStr){
+  const posted = new Date(dateStr);
+  if(isNaN(posted)) return '';
+  const diffDays = Math.floor((Date.now() - posted.getTime()) / 86400000);
+  if(diffDays <= 0) return 'today';
+  if(diffDays === 1) return '1 din pehle';
+  return diffDays + ' din pehle';
+}
+
+function render(){
+  const q = searchInput.value.trim().toLowerCase();
+  let filtered = allJobs.filter(j => {
+    if(q && !(j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q))) return false;
+    if(activeFilter === 'remote' && !j.remote) return false;
+    if(CATEGORY_MAP[activeFilter]){
+      const t = j.title.toLowerCase();
+      if(!CATEGORY_MAP[activeFilter].some(k => t.includes(k))) return false;
+    }
+    return true;
+  });
+
+  countLabel.textContent = filtered.length + ' openings mil gaye';
+
+  if(filtered.length === 0){
+    results.innerHTML = '<div class="empty">koi matching job nahi mila — filter badal ke dekho</div>';
+    return;
+  }
+
+  results.innerHTML = filtered.map(j => `
+    <div class="job">
+      <div class="mark">›</div>
+      <div>
+        <p class="role">${escapeHtml(j.title)}</p>
+        <p class="company"><b>${escapeHtml(j.company)}</b> · ${escapeHtml(j.location || 'remote')} · ${timeAgo(j.date)}</p>
+        <div class="tags">
+          ${j.remote ? '<span>remote</span>' : ''}
+          ${j.tags.slice(0,3).map(t=>`<span>${escapeHtml(t)}</span>`).join('')}
+        </div>
+      </div>
+      <a class="apply" href="${j.url}" target="_blank" rel="noopener">apply →</a>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+chips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.f;
+    render();
+  });
+});
+searchInput.addEventListener('input', render);
+
+const tabs = document.querySelectorAll('.tab');
+const panels = {
+  jobs: document.getElementById('panel-jobs'),
+  internships: document.getElementById('panel-internships'),
+  hackathons: document.getElementById('panel-hackathons'),
+  india: document.getElementById('panel-india')
+};
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    Object.keys(panels).forEach(k => panels[k].style.display = 'none');
+    panels[tab.dataset.tab].style.display = 'block';
+  });
+});
+
+let allInternships = [];
+let activeInternFilter = 'all';
+const resultsIntern = document.getElementById('results-intern');
+const countLabelIntern = document.getElementById('count-label-intern');
+const searchInternInput = document.getElementById('search-intern');
+const internChips = document.querySelectorAll('#panel-internships .chip');
+
+function renderInternships(){
+  const q = searchInternInput.value.trim().toLowerCase();
+  let filtered = allInternships.filter(j => {
+    if(q && !(j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q))) return false;
+    if(activeInternFilter === 'remote' && !j.remote) return false;
+    return true;
+  });
+  countLabelIntern.textContent = filtered.length + ' internships mil gaye';
+  if(filtered.length === 0){
+    resultsIntern.innerHTML = '<div class="empty">abhi koi matching internship nahi mila</div>';
+    return;
+  }
+  resultsIntern.innerHTML = filtered.map(j => `
+    <div class="job">
+      <div class="mark">›</div>
+      <div>
+        <p class="role">${escapeHtml(j.title)}</p>
+        <p class="company"><b>${escapeHtml(j.company)}</b> · ${escapeHtml(j.location || 'remote')} · ${timeAgo(j.date)}</p>
+        <div class="tags">
+          ${j.remote ? '<span>remote</span>' : ''}
+          ${j.tags.slice(0,3).map(t=>`<span>${escapeHtml(t)}</span>`).join('')}
+        </div>
+      </div>
+      <a class="apply" href="${j.url}" target="_blank" rel="noopener">apply →</a>
+    </div>
+  `).join('');
+}
+internChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    internChips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeInternFilter = chip.dataset.f;
+    renderInternships();
+  });
+});
+searchInternInput.addEventListener('input', renderInternships);
+
+function renderHackathons(){
+  const platforms = [
+    {name:'Devpost', desc:'Sabse bada global hackathon listing platform — student aur company dono ke events', url:'https://devpost.com/hackathons'},
+    {name:'Unstop (Dare2Compete)', desc:'India-focused hackathons, coding competitions aur campus events', url:'https://unstop.com/hackathons'},
+    {name:'MLH (Major League Hacking)', desc:'Student hackathons ka official global season calendar', url:'https://mlh.io/seasons/2026/events'},
+    {name:'HackerEarth Challenges', desc:'Company-sponsored hackathons aur coding challenges', url:'https://www.hackerearth.com/challenges/'}
+  ];
+  document.getElementById('results-hack').innerHTML = platforms.map(p => `
+    <div class="hack-card">
+      <div>
+        <p class="h-name">${escapeHtml(p.name)}</p>
+        <p class="h-desc">${escapeHtml(p.desc)}</p>
+      </div>
+      <a class="apply" href="${p.url}" target="_blank" rel="noopener">dekho →</a>
+    </div>
+  `).join('');
+}
+renderHackathons();
+
+function renderIndiaPlatforms(){
+  const platforms = [
+    {name:'Naukri.com', desc:'India ka sabse bada job portal — CSE/IT roles ke liye keyword search karo', url:'https://www.naukri.com/it-jobs'},
+    {name:'LinkedIn Jobs India', desc:'AI, full stack, backend, cyber security — sab CSE roles India location filter ke saath', url:'https://www.linkedin.com/jobs/search/?keywords=software%20engineer&location=India'},
+    {name:'Internshala', desc:'India ka sabse popular student internship platform — CS/IT category', url:'https://internshala.com/internships/computer-science-internship'},
+    {name:'Foundit (Monster India)', desc:'IT/software jobs, fresher se experienced tak', url:'https://www.foundit.in/search/software-engineer-jobs'},
+    {name:'Instahyre', desc:'Curated tech jobs, mostly startups aur product companies', url:'https://www.instahyre.com/'},
+    {name:'Cutshort', desc:'Startup-focused tech hiring platform', url:'https://cutshort.io/'}
+  ];
+  document.getElementById('results-india').innerHTML = platforms.map(p => `
+    <div class="hack-card">
+      <div>
+        <p class="h-name">${escapeHtml(p.name)}</p>
+        <p class="h-desc">${escapeHtml(p.desc)}</p>
+      </div>
+      <a class="apply" href="${p.url}" target="_blank" rel="noopener">dekho →</a>
+    </div>
+  `).join('');
+}
+renderIndiaPlatforms();
+
+async function loadJobs(){
+  termLine.textContent = 'fetching live jobs from jobicy.com';
+  try{
+    const res = await fetch('https://jobicy.com/api/v2/remote-jobs?count=100');
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json();
+    const jobs = (data.jobs || []).filter(j => isCseRelevant(j.jobTitle || ''));
+
+    const mapped = jobs.map(j => ({
+      title: j.jobTitle,
+      company: j.companyName,
+      location: j.jobGeo,
+      remote: true,
+      date: j.pubDate,
+      url: j.url,
+      tags: (j.jobIndustry || []).concat(j.jobType || [])
+    }));
+
+    allJobs = mapped.filter(j => !j.title.toLowerCase().includes('intern'));
+    allInternships = mapped.filter(j => j.title.toLowerCase().includes('intern'));
+
+    if(mapped.length === 0){
+      throw new Error('no cse jobs in feed right now');
+    }
+
+    termLine.textContent = allJobs.length + ' jobs aur ' + allInternships.length + ' internships mil gaye';
+  }catch(err){
+    termLine.textContent = 'live source abhi unavailable — demo data dikha rahe hain';
+    allJobs = fallbackJobs();
+    allInternships = fallbackInternships();
+  }
+  render();
+  renderInternships();
+}
+
+function fallbackInternships(){
+  return [
+    {title:'Software Development Intern', company:'SampleSoft Inc', location:'Remote', remote:true, date:new Date().toISOString(), url:'#', tags:['internship','node.js']},
+    {title:'Data Science Intern', company:'DemoAnalytics Ltd', location:'Remote', remote:true, date:new Date().toISOString(), url:'#', tags:['internship','python']}
+  ];
+}
+
+function fallbackJobs(){
+  return [
+    {title:'Software Engineer (Fresher)', company:'ExampleTech Pvt Ltd', location:'Bengaluru', remote:false, date:new Date().toISOString(), url:'#', tags:['fresher','on-campus']},
+    {title:'Backend Developer Intern', company:'SampleSoft Inc', location:'Remote', remote:true, date:new Date().toISOString(), url:'#', tags:['internship','node.js']},
+    {title:'Frontend Developer', company:'DemoWorks Ltd', location:'Pune', remote:false, date:new Date().toISOString(), url:'#', tags:['react','entry-level']}
+  ];
+}
+
+loadJobs();
+</script>
+</body>
+</html>
