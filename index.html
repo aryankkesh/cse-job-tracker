@@ -184,7 +184,7 @@
 
   <div id="panel-jobs">
     <div class="filters">
-      <input type="text" id="search" placeholder="role ya company search karo (e.g. backend, frontend)">
+      <input type="text" id="search" placeholder="role ya company search (e.g. backend, frontend)">
       <div class="chip active" data-f="all">all roles</div>
       <div class="chip" data-f="ai">AI/ML</div>
       <div class="chip" data-f="fullstack">full stack</div>
@@ -195,20 +195,19 @@
     </div>
     <div class="meta-row">
       <span id="count-label">loading…</span>
-      <span id="src-label">source: jobicy.com</span>
+     
     </div>
     <div id="results"></div>
   </div>
 
   <div id="panel-internships" style="display:none;">
     <div class="filters">
-      <input type="text" id="search-intern" placeholder="internship search karo (e.g. python, design)">
+      <input type="text" id="search-intern" placeholder="internship  (e.g. python, design)">
       <div class="chip active" data-f="all">all</div>
       <div class="chip" data-f="remote">remote</div>
     </div>
     <div class="meta-row">
       <span id="count-label-intern">loading…</span>
-      <span id="src-label-intern">source: jobicy.com </span>
     </div>
     <div id="results-intern"></div>
   </div>
@@ -237,7 +236,7 @@
 
   <div class="note">
     <b></b> 
-  <footer>built as a working prototype · data via jobicy public api</footer>
+  <footer>built as a working prototype </footer>
 </div>
 
 <script>
@@ -437,7 +436,7 @@ async function loadJobs(){
   termLine.textContent = 'fetching live jobs from jobicy.com';
   try{
     const res = await fetch('https://jobicy.com/api/v2/remote-jobs?count=100');
-    if(!res.ok) throw new Error('bad response');
+    if(!res.ok) throw new Error('no response');
     const data = await res.json();
     const jobs = (data.jobs || []).filter(j => isCseRelevant(j.jobTitle || ''));
 
@@ -455,7 +454,7 @@ async function loadJobs(){
     allInternships = mapped.filter(j => j.title.toLowerCase().includes('intern'));
 
     if(mapped.length === 0){
-      throw new Error('no cse jobs in feed right now');
+      throw new Error('no cse jobs in  right now');
     }
 
     termLine.textContent = allJobs.length + ' jobs aur ' + allInternships.length + ' internships';
