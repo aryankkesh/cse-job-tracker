@@ -195,7 +195,7 @@
     </div>
     <div class="meta-row">
       <span id="count-label">loading…</span>
-      <span id="src-label">source: jobicy.com public feed</span>
+      <span id="src-label">source: jobicy.com</span>
     </div>
     <div id="results"></div>
   </div>
@@ -208,37 +208,35 @@
     </div>
     <div class="meta-row">
       <span id="count-label-intern">loading…</span>
-      <span id="src-label-intern">source: jobicy.com public feed</span>
+      <span id="src-label-intern">source: jobicy.com </span>
     </div>
     <div id="results-intern"></div>
   </div>
 
   <div id="panel-hackathons" style="display:none;">
     <div class="meta-row">
-      <span>trusted hackathon platforms — direct links</span>
+      <span>trusted hackathon platforms</span>
       <span></span>
     </div>
     <div id="results-hack"></div>
     <div class="note" style="margin-top:16px;">
-      <b>Note:</b> hackathon listings har platform khud manage karta hai aur koi free public API nahi deta jisse live events yahan auto-fetch ho sakein. Isliye yahan fake/purani listing dikhane ke bajaye seedha un platforms ke live pages diye hain — jahan aap real-time upcoming hackathons dekh sakte ho.
+      <b>Note:</b> Each hackathon platform manages its own listings, and none of them provide a free public API that would let live events be auto-fetched here. So instead of showing fake or outdated listings, direct live pages of these trusted platforms are linked here — where you can see real-time upcoming hackathons.
     </div>
   </div>
 
   <div id="panel-india" style="display:none;">
     <div class="meta-row">
-      <span>India ke trusted job/internship platforms — direct links</span>
+      <span>India ke trusted job/internship platforms</span>
       <span></span>
     </div>
     <div id="results-india"></div>
     <div class="note" style="margin-top:16px;">
-      <b>Note:</b> Naukri, LinkedIn aur Internshala jaisi sites free public API nahi deti — isliye India-specific live jobs is website ke andar auto-fetch nahi ho sakte (wo scraping hoga, jo legally allowed nahi hai). Yahan seedha un platforms ke CSE/tech search pages diye gaye hain jo hamesha live/up-to-date rahenge.
+      <b>Note:</b> Sites like Naukri, LinkedIn and Internshala don't provide a free public API — so India-specific live jobs can't be auto-fetched inside this website (that would be scraping, which isn't legally allowed). Direct search pages of these platforms for CSE/tech roles are linked here instead, which will always stay live and up-to-date.
     </div>
   </div>
 
   <div class="note">
-    <b>Sach batayein:</b> ye ek live-working demo hai jo ek real public job API (Jobicy) se software/tech roles fetch karke dikha raha hai — LinkedIn/Naukri jaisi sites free API nahi deti, isliye unse direct auto-fetch scraping ban jaata hai aur legally risky hai. Ek proper college placement tracker ke liye agla step: apni team/TPO se companies ki career-page links + campus mail alerts ko ek admin panel se curate karna, ya paid job-board API (Adzuna, RapidAPI job boards) jodna.
-  </div>
-
+    <b></b> 
   <footer>built as a working prototype · data via jobicy public api</footer>
 </div>
 
@@ -280,8 +278,8 @@ function timeAgo(dateStr){
   if(isNaN(posted)) return '';
   const diffDays = Math.floor((Date.now() - posted.getTime()) / 86400000);
   if(diffDays <= 0) return 'today';
-  if(diffDays === 1) return '1 din pehle';
-  return diffDays + ' din pehle';
+  if(diffDays === 1) return ' 1 day ago';
+  return diffDays + 'days ago';
 }
 
 function render(){
@@ -296,10 +294,10 @@ function render(){
     return true;
   });
 
-  countLabel.textContent = filtered.length + ' openings mil gaye';
+  countLabel.textContent = filtered.length + ' open';
 
   if(filtered.length === 0){
-    results.innerHTML = '<div class="empty">koi matching job nahi mila — filter badal ke dekho</div>';
+    results.innerHTML = '<div class="empty">No matching jobs found — try change your filters</div>';
     return;
   }
 
@@ -397,10 +395,10 @@ searchInternInput.addEventListener('input', renderInternships);
 
 function renderHackathons(){
   const platforms = [
-    {name:'Devpost', desc:'Sabse bada global hackathon listing platform — student aur company dono ke events', url:'https://devpost.com/hackathons'},
-    {name:'Unstop (Dare2Compete)', desc:'India-focused hackathons, coding competitions aur campus events', url:'https://unstop.com/hackathons'},
-    {name:'MLH (Major League Hacking)', desc:'Student hackathons ka official global season calendar', url:'https://mlh.io/seasons/2026/events'},
-    {name:'HackerEarth Challenges', desc:'Company-sponsored hackathons aur coding challenges', url:'https://www.hackerearth.com/challenges/'}
+    {name:'Devpost', desc:'hackathon listing platform — student and company both events', url:'https://devpost.com/hackathons'},
+    {name:'Unstop (Dare2Compete)', desc:'India-focused hackathons, coding competitions and campus events', url:'https://unstop.com/hackathons'},
+    {name:'MLH (Major League Hacking)', desc:'Student hackathons  official global season calendar', url:'https://mlh.io/seasons/2026/events'},
+    {name:'HackerEarth Challenges', desc:'Company-sponsored hackathons and coding challenges', url:'https://www.hackerearth.com/challenges/'}
   ];
   document.getElementById('results-hack').innerHTML = platforms.map(p => `
     <div class="hack-card">
@@ -416,11 +414,11 @@ renderHackathons();
 
 function renderIndiaPlatforms(){
   const platforms = [
-    {name:'Naukri.com', desc:'India ka sabse bada job portal — CSE/IT roles ke liye keyword search karo', url:'https://www.naukri.com/it-jobs'},
-    {name:'LinkedIn Jobs India', desc:'AI, full stack, backend, cyber security — sab CSE roles India location filter ke saath', url:'https://www.linkedin.com/jobs/search/?keywords=software%20engineer&location=India'},
-    {name:'Internshala', desc:'India ka sabse popular student internship platform — CS/IT category', url:'https://internshala.com/internships/computer-science-internship'},
-    {name:'Foundit (Monster India)', desc:'IT/software jobs, fresher se experienced tak', url:'https://www.foundit.in/search/software-engineer-jobs'},
-    {name:'Instahyre', desc:'Curated tech jobs, mostly startups aur product companies', url:'https://www.instahyre.com/'},
+    {name:'Naukri.com', desc:'India job portal — CSE/IT roles ', url:'https://www.naukri.com/it-jobs'},
+    {name:'LinkedIn Jobs India', desc:'AI, full stack, backend, cyber security — sab CSE roles India location ', url:'https://www.linkedin.com/jobs/search/?keywords=software%20engineer&location=India'},
+    {name:'Internshala', desc:'student internship platform — CS/IT category', url:'https://internshala.com/internships/computer-science-internship'},
+    {name:'Foundit (Monster India)', desc:'IT/software jobs, fresher and experienced ', url:'https://www.foundit.in/search/software-engineer-jobs'},
+    {name:'Instahyre', desc:'gurated tech jobs, mostly startups and product companies', url:'https://www.instahyre.com/'},
     {name:'Cutshort', desc:'Startup-focused tech hiring platform', url:'https://cutshort.io/'}
   ];
   document.getElementById('results-india').innerHTML = platforms.map(p => `
@@ -429,7 +427,7 @@ function renderIndiaPlatforms(){
         <p class="h-name">${escapeHtml(p.name)}</p>
         <p class="h-desc">${escapeHtml(p.desc)}</p>
       </div>
-      <a class="apply" href="${p.url}" target="_blank" rel="noopener">dekho →</a>
+      <a class="apply" href="${p.url}" target="_blank" rel="noopener">see →</a>
     </div>
   `).join('');
 }
@@ -460,9 +458,9 @@ async function loadJobs(){
       throw new Error('no cse jobs in feed right now');
     }
 
-    termLine.textContent = allJobs.length + ' jobs aur ' + allInternships.length + ' internships mil gaye';
+    termLine.textContent = allJobs.length + ' jobs aur ' + allInternships.length + ' internships';
   }catch(err){
-    termLine.textContent = 'live source abhi unavailable — demo data dikha rahe hain';
+    termLine.textContent = 'live source unavailable';
     allJobs = fallbackJobs();
     allInternships = fallbackInternships();
   }
@@ -489,3 +487,5 @@ loadJobs();
 </script>
 </body>
 </html>
+
+
