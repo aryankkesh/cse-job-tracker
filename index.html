@@ -363,9 +363,9 @@ function renderInternships(){
     if(activeInternFilter === 'remote' && !j.remote) return false;
     return true;
   });
-  countLabelIntern.textContent = filtered.length + ' internships mil gaye';
+  countLabelIntern.textContent = filtered.length + ' internships';
   if(filtered.length === 0){
-    resultsIntern.innerHTML = '<div class="empty">abhi koi matching internship nahi mila</div>';
+    resultsIntern.innerHTML = '<div class="empty"> NO Any internshipa</div>';
     return;
   }
   resultsIntern.innerHTML = filtered.map(j => `
