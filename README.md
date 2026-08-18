@@ -9,5 +9,4 @@ CSE students ke liye live job, internship aur hackathon tracker website.
 - India job platforms direct links
 
 ## Live Website
-
-https://aryankkesh.github.io/cse-job-tracker/
+file:///C:/Users/aryan%20keshari/Downloads/cse-job-tracker.html 
